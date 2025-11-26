@@ -1,7 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ruota Scout</title>
     <style>
         body {
@@ -16,6 +19,9 @@
         canvas {
             border-radius: 50%;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            width: 90vw;
+            max-width: 520px;
+            height: auto;
         }
         button {
             margin-top: 20px;
@@ -40,14 +46,15 @@
 </head>
 <body>
 
-<h2 style="display:flex;align-items:center;gap:10px;justify-content:center;">
-  <img src="giglio.png" alt="Logo AGESCI" style="height:40px;vertical-align:middle;">
-  Ruota della Fortuna - Reparto Aurora Boreale - Canicattì 1
-</h2>
+<div style="text-align:center;margin-bottom:10px;">
+  <img src="giglio.png" alt="Logo AGESCI" style="height:60px;display:block;margin:0 auto 5px auto;">
+  <div style="font-size:28px;font-weight:bold;">Ruota della Fortuna</div>
+  <div style="font-size:18px;">Reparto Aurora Boreale - Canicattì 1</div>
+</div>
 
 <div style="position:relative;">
   <div style="position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:4px;height:40px;background:red;border-radius:2px;"></div>
-  <canvas id="wheel" width="400" height="400"></canvas>
+  <canvas id="wheel"></canvas>
 </div>
 
 <button id="spinBtn">Gira la Ruota!</button>
@@ -55,6 +62,15 @@
 
 <script>
 const canvas = document.getElementById('wheel');
+
+function resizeCanvas() {
+  const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.7);
+  canvas.width = size;
+  canvas.height = size;
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 const ctx = canvas.getContext('2d');
 const btn = document.getElementById('spinBtn');
 const resultDiv = document.getElementById('result');
@@ -86,7 +102,12 @@ let blinkState = true;
 let blinkInterval = null;
 
 function drawWheel(){
-  ctx.clearRect(0,0,400,400);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const radius = Math.min(canvas.width, canvas.height) / 2;
+
   for(let i=0;i<segments.length;i++){
     const angle = startAngle + i * arc;
 
@@ -97,17 +118,17 @@ function drawWheel(){
       ctx.fillStyle = colors[i];
     }
 
-    ctx.moveTo(200,200);
-    ctx.arc(200,200,200,angle,angle+arc);
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, angle, angle+arc);
     ctx.fill();
 
     ctx.save();
-    ctx.translate(200,200);
+    ctx.translate(cx, cy);
     ctx.rotate(angle + arc/2);
     ctx.textAlign = "right";
     ctx.fillStyle = "#000";
-    ctx.font = "14px Arial";
-    ctx.fillText(segments[i],180,5);
+    ctx.font = Math.max(radius * 0.07, 14) + "px Arial";
+    ctx.fillText(segments[i], radius - 20, 10);
     ctx.restore();
   }
 }
