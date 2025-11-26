@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Accesso Ruota della Fortuna</title>
+<style>
+body {
+  font-family: Arial;
+  background:#f0f4f8;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.login-box {
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 0 15px rgba(0,0,0,0.2);
+  text-align:center;
+}
+
+input {
+  display:block;
+  margin:10px 0;
+  padding:10px;
+  width:200px;
+}
+
+button {
+  padding:10px 20px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+#error {
+  color:red;
+  margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h2>🔐 Accesso Ruota della Fortuna </h2>
+  <input type="text" id="user" placeholder="Nome utente">
+  <input type="password" id="pass" placeholder="Password">
+  <button onclick="login()">Entra</button>
+  <div id="error"></div>
+</div>
+
+<script>
+function login() {
+  const u = document.getElementById('user').value;
+  const p = document.getElementById('pass').value;
+
+  if(u === "ruota" && p === "auroraboreale") {
+    window.location.href = "ruota.html";
+  } else {
+    document.getElementById('error').innerText = "Credenziali errate!";
+  }
+}
+</script>
+
+</body>
+</html>

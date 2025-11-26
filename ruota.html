@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Ruota Scout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        canvas {
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="display:flex;align-items:center;gap:10px;justify-content:center;">
+  <img src="giglio.png" alt="Logo AGESCI" style="height:40px;vertical-align:middle;">
+  Ruota della Fortuna - Reparto Aurora Boreale - Canicattì 1
+</h2>
+
+<div style="position:relative;">
+  <div style="position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:4px;height:40px;background:red;border-radius:2px;"></div>
+  <canvas id="wheel" width="400" height="400"></canvas>
+</div>
+
+<button id="spinBtn">Gira la Ruota!</button>
+<div id="result"></div>
+
+<script>
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const btn = document.getElementById('spinBtn');
+const resultDiv = document.getElementById('result');
+
+const segments = [
+  "PASSA",
+  "Campeggiatore", "Trapper", "Topografo", "Infermiere",
+  "Sherpa", "Magazziniere", "Cuoco", "Falegname",
+  "PASSA",
+  "Astronomo", "Mani abili", "Tesoriere", "Pioniere",
+  "Attore", "Segretario", "JOLLY"
+];
+
+const colors = [
+  "#AAAAAA",
+  "#ffcc00", "#ff9999", "#99ccff", "#99ff99",
+  "#ff9966", "#cc99ff", "#66cccc", "#ff6666",
+  "#AAAAAA",
+  "#66ff99", "#ffcc99", "#ccccff", "#ffff99",
+  "#ffb3d9", "#b3ffb3",
+  "#ffff00"
+];
+
+let startAngle = 0;
+const arc = Math.PI * 2 / segments.length;
+let spinning = false;
+let winningSegment = null;
+let blinkState = true;
+let blinkInterval = null;
+
+function drawWheel(){
+  ctx.clearRect(0,0,400,400);
+  for(let i=0;i<segments.length;i++){
+    const angle = startAngle + i * arc;
+
+    ctx.beginPath();
+    if(i === winningSegment && blinkState){
+      ctx.fillStyle = '#ffffff';
+    } else {
+      ctx.fillStyle = colors[i];
+    }
+
+    ctx.moveTo(200,200);
+    ctx.arc(200,200,200,angle,angle+arc);
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(200,200);
+    ctx.rotate(angle + arc/2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#000";
+    ctx.font = "14px Arial";
+    ctx.fillText(segments[i],180,5);
+    ctx.restore();
+  }
+}
+
+function startBlink(){
+  if(blinkInterval) clearInterval(blinkInterval);
+  blinkInterval = setInterval(()=>{
+    blinkState = !blinkState;
+    drawWheel();
+  }, 400);
+}
+
+function spinWheel(){
+  if(spinning) return;
+  spinning = true;
+  resultDiv.textContent = "";
+  winningSegment = null;
+
+  if(blinkInterval) clearInterval(blinkInterval);
+
+  let spinTime = 0;
+  const spinTotal = 5000;
+  const spinAngleStart = Math.random()*10+10;
+
+  function rotate(){
+    spinTime += 30;
+    if(spinTime >= spinTotal){ stopRotate(); return; }
+
+    const spinAngle = spinAngleStart * (1 - spinTime / spinTotal);
+    startAngle += spinAngle * Math.PI / 180;
+
+    drawWheel();
+    requestAnimationFrame(rotate);
+  }
+
+  function stopRotate(){
+    const degrees = startAngle * 180 / Math.PI + 90;
+    const arcd = arc * 180 / Math.PI;
+    const index = Math.floor((360 - degrees % 360) / arcd);
+
+    winningSegment = index;
+    resultDiv.textContent = "È uscito: " + segments[index];
+    startBlink();
+    spinning = false;
+  }
+
+  rotate();
+}
+
+btn.addEventListener('click', spinWheel);
+drawWheel();
+</script>
+
+</body>
+</html>
